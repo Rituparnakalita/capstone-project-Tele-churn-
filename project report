@@ -1,0 +1,485 @@
+Springboard DSC Capstone Project I
+Telecom customer churn prediction  
+Name: Rituparna kalita
+Date:1/9/23
+
+Table of Contents  
+1.	Introduction ...................................................4 
+2.	Dataset ........................................................4  
+3.	Data Wrangling .................................................5 
+a. Handling missing 
+b. Handling inconsistent 
+4.	Data Exploration ...............................................6
+	Some interesting questions.................................... .8
+5.	Data Standardization ......................................... 11
+6.	Encoding Categorical Data..................................... 11
+7.	 Train and Test Sets.......................................... 12
+8.	 Cross Validation............................................. 12
+9.	Summary ...................................................... 12
+10.	Further Analysis ..
+
+INTRODUCTION
+This dataset comprises a collection of transactions involving customers of a telecommunications company. Each row contains detailed information about an individual customer, including their Customer ID, Gender, Age, Marital status, Number of Dependents, City, Zip Code, Latitude, Longitude, Number of Referrals, Payment Method, Monthly Charge, Total Charges, Total Refunds, Total Extra Data Charges, Total Long Distance Charges, Total Revenue, Customer Status, Churn Category, and Churn Reason.
+The dataset holds valuable information for analyzing customer churn behavior. Churn behavior refers to the situation where customers discontinue using the company's services, and this dataset includes insights into which customers have churned and the reasons behind their churn. Customers have been categorized into 'Churned' and 'Stayed' segments, with specific churn reasons provided such as 'Product dissatisfaction', 'Network reliability', 'Competitor had better devices', and more.
+
+2. Dataset
+This dataset provides insights into customer information and interactions within a telecommunications company. It includes 7043 observations, each representing a distinct customer, and features 20 detailed attributes that capture various aspects of their engagement with the company's services. The dataset offers valuable information to analyze customer behavior, preferences, and potential churn patterns. The dataset is extracted from Kaggle https://www.kaggle.com/datasets/shilongzhuang/telecom-customer-churn-by-maven-analytics
+Key features within this dataset include:
+1.	Customer ID: 
+2.	Gender: 
+3.	Age: 
+4.	Married: 
+5.	Number of Dependents: T
+6.	City: 
+7.	Zip Code: 
+8.	Latitude and Longitude: 
+9.	Number of Referrals: 
+10.	Payment Method: 
+11.	Monthly Charge: 
+12.	Total Charges: 
+13.	Total Refunds: 
+14.	Total Extra Data Charges: 
+15.	Total Long Distance Charges: 
+16.	Total Revenue: 
+17.	Customer Status: 
+18.	Churn Category: 
+19.	Churn Reason: 
+
+The research methods, tools, and techniques used in your project are:
+numpy,pandas,,matplotlib.pyplot,seaborn,logistic regression,RandomForestClassification,Naive Byas,xgboost,decision_tree
+
+3. Data Wrangling
+Data Wrangling is an extremely important step for any data analysis. It is very crucial for data to be organized. This process typically includes manually converting/mapping data from one raw form into another format to allow for more convenient consumption and organization of the data.
+Data Cleaning steps carried out in this project are: 
+i. Handling missing data 
+ii.  Handling inconsistent data in a few variables
+
+Telecom customer churn data set information:
+<class 'pandas.core.frame.DataFrame'>
+Int64Index: 6361 entries, 0 to 7041
+Data columns (total 29 columns):
+ #   Column                             Non-Null Count  Dtype  
+---  ------                             --------------  -----  
+ 0   Gender                             6361 non-null   object 
+ 1   Age                                6361 non-null   int64  
+ 2   Married                            6361 non-null   object 
+ 3   Number of Dependents               6361 non-null   int64  
+ 4   Tenure in Months                   6361 non-null   int64  
+ 5   Offer                              6361 non-null   object 
+ 6   Avg Monthly Long Distance Charges  6361 non-null   float64
+ 7   Multiple Lines                     6361 non-null   object 
+ 8   Internet Service                   6361 non-null   object 
+ 9   Internet Type                      6361 non-null   object 
+ 10  Avg Monthly GB Download            6361 non-null   object 
+ 11  Online Security                    6361 non-null   object 
+ 12  Online Backup                      6361 non-null   object 
+ 13  Device Protection Plan             6361 non-null   object 
+ 14  Premium Tech Support               6361 non-null   object 
+ 15  Streaming TV                       6361 non-null   object 
+ 16  Streaming Movies                   6361 non-null   object 
+ 17  Streaming Music                    6361 non-null   object 
+ 18  Unlimited Data                     6361 non-null   object 
+ 19  Contract                           6361 non-null   object 
+ 20  Paperless Billing                  6361 non-null   object 
+ 21  Payment Method                     6361 non-null   object 
+ 22  Monthly Charge                     6361 non-null   float64
+ 23  Total Charges                      6361 non-null   float64
+ 24  Total Refunds                      6361 non-null   float64
+ 25  Total Extra Data Charges           6361 non-null   int64  
+ 26  Total Long Distance Charges        6361 non-null   float64
+ 27  Total Revenue                      6361 non-null   float64
+ 28  Customer Status                    6361 non-null   object 
+dtypes: float64(6), int64(4), object(19)  memory usage: 1.5+ MB
+
+a.   Handling missing
+
+	Categorical Data:When working with categorical data, you often need to encode them numerically to be used as inputs for machine learning algorithms. The common approaches include:
+Label Encoding: Assigns a unique numerical label to each category. This is suitable for ordinal data or when the categories have some kind of intrinsic order. However, it might not be suitable for nominal data.
+
+	Numerical Data:
+
+Handling numerical data involves tasks like scaling, normalization, and imputation for missing values:
+Scaling: Scaling numerical features can help algorithms converge faster during training. Common methods include Min-Max Scaling and Z-score normalization.
+Imputation: Dealing with missing values by replacing them with meaningful values. Common strategies include mean, median, or using more advanced methods like k-nearest neighbors imputation.
+
+
+Creating a copy of the Dataset
+df1=df.head()
+Data preprocessing
+Dropping unwanted columns from the dataset
+df1.drop(['Customer ID','Total Refunds','Zip Code','Latitude', 'Longitude','Churn Category', 'Churn Reason'],axis='columns',inplace=True)
+
+Cleaning Function for the Dataset
+def clean_dataset(df):
+    assert isinstance(df, pd.DataFrame)
+    df.dropna(inplace=True)
+    indices_to_keep = ~df.isin([np.nan, np.inf, -np.inf]).any(1)
+    return df[indices_to_keep].astype(np.float64)
+    The provided code defines a Python function called clean_dataset that is meant to clean a pandas DataFrame (df) by removing rows with missing or infinite (positive or negative) values and then returning the cleaned DataFrame
+    Checking the unique values of column having datatype: 'object
+    def unique_values_names(df):
+    for column in df:
+        if df[column].dtype=='object':
+            print(f'{column}:{df[column].unique()}')
+
+    This function is a useful tool to quickly inspect and understand the unique values within object-type columns in your DataFrame
+
+    Data Visualization
+
+    fig = px.histogram(df1, x = 'Age')
+fig.show()
+This code will generate a histogram of the 'Age' column using Plotly Express and display it.
+
+Checking the stats in number_columns of the copied dataset
+
+df1.hist(figsize=(15,15), xrot=30)
+
+Visualizing the number of customers who churned, stayed or joined in the company with a bar plot
+
+Customer_Stayed=df1[df1['Customer Status']=='Stayed'].Age
+Customer_Churned=df1[df1['Customer Status']=='Churned'].Age
+Customer_Joined=df1[df1['Customer Status']=='Joined'].Age
+
+plt.xlabel('Age')
+plt.ylabel('Customers Numbers')
+plt.hist([Customer_Stayed,Customer_Churned,Customer_Joined], color=['black','red','blue'],label=['Stayed','Churned','Joined'])
+
+plt.title('Customers Behavior ',fontweight ="bold")
+plt.legend()
+
+This code will give you a stacked bar plot that shows the distribution of customers across age groups for each customer status: 'Stayed', 'Churned', and 'Joined'.
+
+Analyzing Outlier in the dataset with respect to customer status
+
+In this code:
+
+We specify the number of rows and columns for the subplot grid using num_rows and num_cols.
+
+We create a grid of subplots using plt.subplots() and flatten the axes using ax.flatten() to iterate through them.
+
+We loop through each numeric column (assuming number_columns is a list of numeric column names) and create a boxplot for each column based on the 'Customer Status' using sns.boxplot().
+
+We set the subplot title to the column name using ax[i].set_title(column).
+
+We adjust the subplot spacing with plt.tight_layout() for better visualization.
+
+Finally, we display the plot using plt.show().
+
+This code will create a grid of boxplots, one for each numeric column, showing the distribution of each numeric variable based on the 'Customer Status'
+
+Create dictionary with role / data key value pairs
+
+Roles = {}
+for j in df1['Payment Method'].unique():
+    Roles[j] = df1[df1['Payment Method'] == j]
+    This will give us a DataFrame containing only the rows with the 'Payment Method' set to 'Credit Card'.
+
+    import plotly.graph_objects as go
+
+    fig = go.Figure([go.Bar(x=off.index, y=off.values)])
+fig.show()
+
+This code creates a bar chart using Plotly with the data from the off variable. Make sure to replace 'off' with your actual data, and customize the chart title and axis labels as needed.
+
+df1 = df1.rename(columns = {'Customer Status':'Customer_Status'})
+
+Now, the 'Customer_Status' column contains the values from the previously named 'Customer Status' column.
+
+Roles1 = {}
+for k in df1['Customer_Status'].unique():
+    Roles1[k] = df1[df1['Customer_Status'] == k]
+Roles1.keys()
+
+This will give you a DataFrame containing  the rows with the 'Customer_Status' set to 'Stayed','Churned', 'Joined'.
+
+Data Modelling
+
+Replacing the Gender column in the dataset with Label Encoding
+
+0 for Female
+
+1 for Male
+df1.replace({"Gender":{'Female':0,'Male':1}},inplace=True)
+
+
+
+
+After running this code, the 'Gender' column in df1 will have the values 0 for 'Female' and 1 for 'Male'. The DataFrame will be updated accordingly, and you can continue working with it with the new values in the 'Gender' column
+
+Replacing the columns with 'yes' and 'no' output by Label Encoding
+
+0 for No
+
+1 for Yes
+
+yes_and_no=[  'Paperless Billing', 'Unlimited Data', 
+       'Streaming Movies', 'Streaming Music',  'Streaming TV',
+       'Premium Tech Support', 'Device Protection Plan', 'Online Backup', 'Online Security',
+       'Multiple Lines',  'Married']
+for i in yes_and_no:
+    df1.replace({'No':0,'Yes':1},inplace=True)
+
+    In this code:
+
+We loop through each column name specified in the yes_and_no list.
+For each column, we use the .replace() method to replace 'No' with 0 and 'Yes' with 1 within that specific column.
+After running this code, the specified columns in df1 will have 'No' replaced with 0 and 'Yes' replaced with 1. Make sure that the column names in the yes_and_no list match the actual column names in your DataFrame.
+
+Replacing 'Phone Service' with '1'
+
+df1.replace({"Phone Service":{'Yes':1}},inplace=True)
+
+After running this code, the 'Phone Service' column in df1 will have 'Yes' replaced with 1.
+
+from sklearn.preprocessing import LabelEncoder
+le = LabelEncoder()
+df1.Customer_Status = le.fit_transform(df1.Customer_Status)
+
+In this code:
+
+we import the LabelEncoder class from scikit-learn.
+
+we create an instance of LabelEncoder called le.
+
+we use the fit_transform method of the LabelEncoder to transform the 'Customer_Status' column in your DataFrame. This method replaces the categorical labels ('Stayed', 'Churned', 'Joined') with numerical values.
+
+After running this code, the 'Customer_Status' column in your DataFrame df1 will be replaced with numerical values (e.g., 0 for 'Stayed', 1 for 'Churned', 2 for 'Joined'), making it suitable for machine learning algorithms that require numerical inputs.
+
+cols_to_scale = ['Age','Number of Dependents','Number of Referrals','Tenure in Months','Avg Monthly Long Distance Charges','Avg Monthly GB Download','Monthly Charge', 'Total Charges',
+       'Total Extra Data Charges', 'Total Long Distance Charges','Total Revenue']
+
+from sklearn.preprocessing import MinMaxScaler
+scaler = MinMaxScaler()
+df1[cols_to_scale] = scaler.fit_transform(df1[cols_to_scale])
+
+In this code:
+
+we import the MinMaxScaler class from scikit-learn.
+
+we define the list cols_to_scale, which contains the names of the columns you want to scale.
+
+we create an instance of MinMaxScaler called scaler.
+
+we use the fit_transform method of the MinMaxScaler to scale the specified columns in your DataFrame. This method scales the values within each column to a range between 0 and 1 based on the minimum and maximum values within each column.
+
+After running this code, the specified columns in your DataFrame df1 will be scaled, and their values will be in the range [0, 1], making them suitable for many machine learning algorithms that are sensitive to the scale of features.
+
+Dealing with Imbalance Data
+Dropping the Customer_Status
+
+i.e. The column that we have to predict and set as a dependent variable
+
+X = df1.drop('Customer_Status',axis='columns')
+y = df1['Customer_Status']
+
+In this code:
+
+X contains the feature variables, which are all the columns in df1 except for 'Customer_Status'. we use the .drop() method to drop the 'Customer_Status' column along the specified axis (columns).
+
+y contains the target variable, which is the 'Customer_Status' column. we select this column using square brackets.
+
+Now, X contains the features that our machine learning model will use to make predictions, and y contains the corresponding target values you want to predict. we can proceed to split your data into training and testing sets, train a machine learning model, and evaluate its performance.
+
+Data Model Building
+Spliiting the data in Training and Test Data
+
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y,test_size=0.2,random_state=5)
+
+In this code:
+
+we import the train_test_split function from scikit-learn.
+
+we specify the feature variables (X) and the target variable (y) as input to the function.
+
+test_size=0.2 indicates that 20% of the data will be used for testing, while the remaining 80% will be used for training.
+
+random_state=5 is set to ensure reproducibility. It fixes the random seed for the data splitting process so that you get the same split each time you run the code. You can change this value if you want a different random split.
+
+After running this code, we'll have four sets of data:
+
+X_train: Training feature variables
+X_test: Testing feature variables
+y_train: Training target variable
+y_test: Testing target variable
+we can now use these datasets to train and evaluate machine learning models.
+
+Importing the required files for the model that is to applied
+
+1.Random Forest Classifier
+
+2.Logistic Regression
+
+3.GaussianNB
+
+4.Decision Tree Classifier
+
+5.XGB Classifier
+
+pip install xgboost
+
+This command will download and install the XGBoost library and its dependencies from the Python Package Index (PyPI)
+
+model_params = {
+     
+    'random_forest': {
+        'model': RandomForestClassifier(),
+        'params' : {
+            'n_estimators': [1,5,10]
+        }
+    },
+    'logistic_regression' : {
+        'model': LogisticRegression(solver='liblinear',multi_class='auto'),
+        'params': {
+            'C': [1,5,10]
+        }
+},
+    'naive_bayes_gaussian': {
+        'model': GaussianNB(),
+        'params': {}
+    },
+    
+    'decision_tree': {
+        'model': DecisionTreeClassifier(),
+        'params': {
+            'criterion': ['gini','entropy'],
+        }    
+    },
+             'XGB_Classifier':{
+        'model':XGBClassifier(),
+        'params':{
+            'base_score':[0.5]
+            
+        }
+    },   
+}
+In this dictionary:
+
+we have specified five different classifiers: 'random_forest', 'logistic_regression', 'naive_bayes_gaussian', 'decision_tree', and 'XGB_Classifier'.
+
+For each classifier, we've provided the model itself (e.g., RandomForestClassifier(), LogisticRegression()) and a dictionary of hyperparameters to be tuned using techniques like grid search or random search.
+
+For example, for 'random_forest', you've specified the 'n_estimators' hyperparameter with values [1, 5, 10].
+
+For 'logistic_regression', we've specified the 'C' hyperparameter with values [1, 5, 10].
+
+For 'decision_tree', we've specified the 'criterion' hyperparameter with values ['gini', 'entropy'].
+
+For 'XGB_Classifier', we've specified the 'base_score' hyperparameter with a fixed value [0.5].
+
+This dictionary structure can be used in conjunction with a grid search or other hyperparameter tuning techniques to find the best hyperparameters for each model when fitting them to our data.
+
+
+from sklearn.model_selection import GridSearchCV
+scores = []
+cv = ShuffleSplit(n_splits=5, test_size=0.2, random_state=0)
+for model_name, mp in model_params.items():
+    clf =  GridSearchCV(mp['model'], mp['params'], cv=cv, return_train_score=False)
+    clf.fit(X,y)
+    scores.append({
+        'model': model_name,
+        'best_score': clf.best_score_,
+        'best_params': clf.best_params_
+    })
+    
+df = pd.DataFrame(scores,columns=['model','best_score','best_params'])
+df
+
+	model	best_score	best_params
+0	random_forest	0.786763	{'n_estimators': 10}
+1	logistic_regression	0.782834	{'C': 5}
+2	naive_bayes_gaussian	0.367735	{}
+3	decision_tree	0.773526	{'criterion': 'gini'}
+4	XGB_Classifier	0.818821	{'base_score': 0.5}
+It was concluded that XGB_Classifier was giving us the best_score in the dataset
+
+
+In this code:
+
+We import GridSearchCV and ShuffleSplit from scikit-learn, as well as pandas.
+
+We define the cv variable with a ShuffleSplit cross-validation strategy for 5 splits and a test size of 20%.
+
+We loop through each model specified in model_params, create a GridSearchCV instance for hyperparameter tuning, fit it to the data (X and y), and store the best score and best parameters in the scores list.
+
+Finally, we create a DataFrame df from the collected results and display it, showing the model names, best scores, and best hyperparameters.
+
+This code will help you compare the performance of different models and their corresponding best hyperparameters.
+
+reg=XGBClassifier()
+reg.fit(X_train, y_train)
+
+In this code:
+
+we import the XGBClassifier class from the XGBoost library.
+
+we create an instance of the XGBClassifier called reg.
+
+we use the .fit() method to train the model on your training data (X_train and y_train).
+
+After running this code, our XGBoost classifier (reg) will be trained on the training data, and we can use it to make predictions on new or test data.
+
+reg.score(X_test, y_test)
+0.8066184074457083
+We got an accuracy of 80.86 percent in the testing dataset
+
+y_predicted = reg.predict(X_test)
+y_predicted[:5]
+array([2, 2, 0, 2, 2], dtype=int64)
+
+y_test[:5]
+3076    2
+2931    2
+3814    0
+5052    2
+2128    0
+Name: Customer_Status, dtype: int32
+
+Verifying the actual values with the predicted values
+importing confusion matrix
+import seaborn as sn
+from sklearn.metrics import confusion_matrix
+cm = confusion_matrix(y_test, y_predicted)
+plt.figure(figsize = (10,7))
+sn.heatmap(cm, annot=True)
+plt.xlabel('Predicted')
+plt.ylabel('Truth')
+This heatmap will help you visually assess how well your model is performing in terms of classifying samples into different classes.
+
+Importing Classification Report
+
+from sklearn.metrics import classification_report
+print(classification_report(y_test, y_predicted))
+precision    recall  f1-score   support
+
+           0       0.76      0.68      0.72       348
+           1       0.72      0.46      0.56        50
+           2       0.83      0.92      0.87       569
+
+    accuracy                           0.81       967
+   macro avg       0.77      0.68      0.72       967
+weighted avg       0.80      0.81      0.80       967
+
+from sklearn.metrics import accuracy_score
+accuracy_score(y_test, y_predicted)
+0.8066184074457083
+
+In this code:
+
+y_test represents the true labels or ground truth from the test dataset.
+
+y_predicted should contain the predictions made by our model on the test data.
+
+The accuracy_score function computes the accuracy and stores it in the accuracy variable.
+
+We use print to display the accuracy score. It's a value between 0 and 1, where 1 represents perfect accuracy.
+
+This score quantifies how well your model performed on the test data in terms of classification accuracy.
+In the end we conclude that the Telecom Customer Churn Prediction was best worked with XGB_Classifier with an accuracy score of 80.86%
+
+CHOOSE BEST MODEL
+
+So my final selection would be XGB Classifier
+
+It's great that you have chosen the XGBoost Classifier (XGBClassifier) as our final model! XGBoost is a powerful and widely used machine learning algorithm known for its high performance in various types of datasets and classification problems. It often performs very well and is a popular choice in machine learning competitions
+
